@@ -1,4 +1,4 @@
-package fretboard
+package music
 
 import (
 	"fmt"

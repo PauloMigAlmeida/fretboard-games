@@ -1,6 +1,7 @@
-package fretboard
+package instrument
 
 import (
+	"github.com/PauloMigAlmeida/fretboard-games/music"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -8,13 +9,13 @@ import (
 
 func TestFretboard_GetNoteAt(t *testing.T) {
 	// standard tuning test
-	eNote, _ := FindNote(E, Natural)
-	bNote, _ := FindNote(B, Natural)
-	gNote, _ := FindNote(G, Natural)
-	dNote, _ := FindNote(D, Natural)
-	aNote, _ := FindNote(A, Natural)
+	eNote, _ := music.FindNote(music.E, music.Natural)
+	bNote, _ := music.FindNote(music.B, music.Natural)
+	gNote, _ := music.FindNote(music.G, music.Natural)
+	dNote, _ := music.FindNote(music.D, music.Natural)
+	aNote, _ := music.FindNote(music.A, music.Natural)
 
-	fretboard := NewFretboard(24, []*Note{
+	fretboard := NewFretboard(24, []*music.Note{
 		eNote,
 		bNote,
 		gNote,
@@ -29,10 +30,10 @@ func TestFretboard_GetNoteAt(t *testing.T) {
 
 	assert.True(t, reflect.DeepEqual(
 		note,
-		&Note{
-			Name:            A,
-			Symbol:          Natural,
-			EnharmonicNames: []EnharmonicType{},
+		&music.Note{
+			Name:            music.A,
+			Symbol:          music.Natural,
+			EnharmonicNames: []music.EnharmonicType{},
 		}))
 
 	// test #2
@@ -41,10 +42,10 @@ func TestFretboard_GetNoteAt(t *testing.T) {
 
 	assert.True(t, reflect.DeepEqual(
 		note,
-		&Note{
-			Name:            E,
-			Symbol:          Natural,
-			EnharmonicNames: []EnharmonicType{{Name: F, Symbol: Flat}},
+		&music.Note{
+			Name:            music.E,
+			Symbol:          music.Natural,
+			EnharmonicNames: []music.EnharmonicType{{Name: music.F, Symbol: music.Flat}},
 		}))
 
 	// invalid string #1

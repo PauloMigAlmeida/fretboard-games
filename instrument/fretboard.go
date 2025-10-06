@@ -1,12 +1,15 @@
-package fretboard
+package instrument
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/PauloMigAlmeida/fretboard-games/music"
+)
 
 type Fretboard struct {
 	Strings []*String
 }
 
-func NewFretboard(numOfFrets int, tuning []*Note) *Fretboard {
+func NewFretboard(numOfFrets int, tuning []*music.Note) *Fretboard {
 	strings := make([]*String, len(tuning))
 
 	for i := range len(strings) {
@@ -18,7 +21,7 @@ func NewFretboard(numOfFrets int, tuning []*Note) *Fretboard {
 	}
 }
 
-func (f *Fretboard) GetNoteAt(stringNumber int, fretNumber int) (*Note, error) {
+func (f *Fretboard) GetNoteAt(stringNumber int, fretNumber int) (*music.Note, error) {
 	if stringNumber < 1 {
 		return nil, fmt.Errorf("strings are 1-indexed to be relation to how we number them in real world")
 	}
