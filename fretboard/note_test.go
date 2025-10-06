@@ -58,12 +58,34 @@ func TestNote_NextHalfStepNote(t *testing.T) {
 	}))
 }
 
+func TestNote_NextWholeStepNote(t *testing.T) {
+	// simple whole step
+	note, _ := FindNote(D, Natural)
+	nextWholeStep, err := note.NextWholeStepNote()
+	assert.Nil(t, err)
+	assert.True(t, reflect.DeepEqual(nextWholeStep, &Note{
+		E,
+		Natural,
+		[]EnharmonicType{{Name: F, Symbol: Flat}},
+	}))
+
+	// whole step that triggers circular queue logic
+	note, _ = FindNote(A, Natural)
+	nextWholeStep, err = note.NextWholeStepNote()
+	assert.Nil(t, err)
+	assert.True(t, reflect.DeepEqual(nextWholeStep, &Note{
+		B,
+		Natural,
+		[]EnharmonicType{{Name: C, Symbol: Flat}},
+	}))
+}
+
 func TestNote_PreviousHalfStepNote(t *testing.T) {
 	// simple half step
 	note, _ := FindNote(D, Natural)
-	nextHalfStep, err := note.PreviousHalfStepNote()
+	previousHalfStep, err := note.PreviousHalfStepNote()
 	assert.Nil(t, err)
-	assert.True(t, reflect.DeepEqual(nextHalfStep, &Note{
+	assert.True(t, reflect.DeepEqual(previousHalfStep, &Note{
 		C,
 		Sharp,
 		[]EnharmonicType{{Name: D, Symbol: Flat}},
@@ -71,11 +93,33 @@ func TestNote_PreviousHalfStepNote(t *testing.T) {
 
 	// half step the triggers circular queue logic
 	note, _ = FindNote(C, Natural)
-	nextHalfStep, err = note.PreviousHalfStepNote()
+	previousHalfStep, err = note.PreviousHalfStepNote()
 	assert.Nil(t, err)
-	assert.True(t, reflect.DeepEqual(nextHalfStep, &Note{
+	assert.True(t, reflect.DeepEqual(previousHalfStep, &Note{
 		B,
 		Natural,
 		[]EnharmonicType{{Name: C, Symbol: Flat}},
+	}))
+}
+
+func TestNote_PreviousWholeStepNote(t *testing.T) {
+	// simple whole step
+	note, _ := FindNote(D, Natural)
+	previousWholeStep, err := note.PreviousWholeStepNote()
+	assert.Nil(t, err)
+	assert.True(t, reflect.DeepEqual(previousWholeStep, &Note{
+		C,
+		Natural,
+		[]EnharmonicType{{Name: B, Symbol: Sharp}},
+	}))
+
+	// whole step that triggers circular queue logic
+	note, _ = FindNote(C, Natural)
+	previousWholeStep, err = note.PreviousWholeStepNote()
+	assert.Nil(t, err)
+	assert.True(t, reflect.DeepEqual(previousWholeStep, &Note{
+		A,
+		Sharp,
+		[]EnharmonicType{{Name: B, Symbol: Flat}},
 	}))
 }

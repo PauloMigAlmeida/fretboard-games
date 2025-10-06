@@ -84,6 +84,14 @@ func (n *Note) NextHalfStepNote() (*Note, error) {
 	return nil, fmt.Errorf("note '%s' not found", n.Name)
 }
 
+func (n *Note) NextWholeStepNote() (*Note, error) {
+	firstStep, err := n.NextHalfStepNote()
+	if err != nil {
+		return nil, err
+	}
+	return firstStep.NextHalfStepNote()
+}
+
 func (n *Note) PreviousHalfStepNote() (*Note, error) {
 	for i, note := range notes {
 		if note.Name == n.Name && note.Symbol == n.Symbol {
@@ -94,4 +102,12 @@ func (n *Note) PreviousHalfStepNote() (*Note, error) {
 		}
 	}
 	return nil, fmt.Errorf("note '%s' not found", n.Name)
+}
+
+func (n *Note) PreviousWholeStepNote() (*Note, error) {
+	firstStep, err := n.PreviousHalfStepNote()
+	if err != nil {
+		return nil, err
+	}
+	return firstStep.PreviousHalfStepNote()
 }
