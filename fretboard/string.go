@@ -5,10 +5,10 @@ type String struct {
 }
 
 func NewString(openNote *Note, numOfFrets int) *String {
-	fretNotes := make([]Note, numOfFrets+1) // 0-indexed
+	fretNotes := make([]Note, numOfFrets) // 0-indexed
 	currNote := *openNote
 
-	for i := range numOfFrets + 1 {
+	for i := range numOfFrets {
 		fretNotes[i] = currNote
 		nextNote, _ := currNote.NextHalfStepNote()
 		currNote = *nextNote
