@@ -8,21 +8,7 @@ import (
 )
 
 func TestFretboard_GetNoteAt(t *testing.T) {
-	// standard tuning test
-	eNote, _ := music.FindNote(music.E, music.Natural)
-	bNote, _ := music.FindNote(music.B, music.Natural)
-	gNote, _ := music.FindNote(music.G, music.Natural)
-	dNote, _ := music.FindNote(music.D, music.Natural)
-	aNote, _ := music.FindNote(music.A, music.Natural)
-
-	fretboard := NewFretboard(24, []*music.Note{
-		eNote,
-		bNote,
-		gNote,
-		dNote,
-		aNote,
-		eNote,
-	})
+	fretboard := NewFretboard(24, StandardTuning())
 
 	// test #1
 	note, err := fretboard.GetNoteAt(1, 5)
