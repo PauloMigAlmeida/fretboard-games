@@ -24,3 +24,10 @@ func TestNewString(t *testing.T) {
 		assert.True(t, reflect.DeepEqual(str.FretNotes[i], expected[i]))
 	}
 }
+
+func TestString_FindNote(t *testing.T) {
+	eNote, _ := music.FindNote(music.E, music.Natural)
+	str := NewString(eNote, 24)
+
+	assert.Equal(t, str.FindNote(eNote), []int{0, 12})
+}

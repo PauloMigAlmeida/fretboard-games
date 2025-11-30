@@ -1,6 +1,9 @@
 package instrument
 
-import "github.com/PauloMigAlmeida/fretboard-games/music"
+import (
+	"github.com/PauloMigAlmeida/fretboard-games/music"
+	"reflect"
+)
 
 type String struct {
 	FretNotes []music.Note
@@ -36,4 +39,16 @@ func StandardTuning() []*music.Note {
 		aNote,
 		eNote,
 	}
+}
+
+func (s *String) FindNote(note *music.Note) []int {
+	foundInFrets := make([]int, 0)
+
+	for fretNum, fretNote := range s.FretNotes {
+		if reflect.DeepEqual(fretNote, *note) {
+			foundInFrets = append(foundInFrets, fretNum)
+		}
+	}
+
+	return foundInFrets
 }
