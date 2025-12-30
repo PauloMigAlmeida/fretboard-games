@@ -12,14 +12,14 @@ type Fretboard struct {
 }
 
 func NewFretboard(numOfFrets int, tuning []*music.Note) *Fretboard {
-	strings := make([]*String, len(tuning))
+	fretStrings := make([]*String, len(tuning))
 
-	for i := range len(strings) {
-		strings[i] = NewString(tuning[i], numOfFrets)
+	for i := range len(fretStrings) {
+		fretStrings[i] = NewString(tuning[i], numOfFrets)
 	}
 
 	return &Fretboard{
-		Strings: strings,
+		Strings: fretStrings,
 	}
 }
 
