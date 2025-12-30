@@ -73,7 +73,7 @@ func FindNote(name NaturalNote, symbol Accidental) (*Note, error) {
 
 func (n *Note) NextHalfStepNote() (*Note, error) {
 	for i, note := range notes {
-		if note.Name == n.Name && note.Symbol == n.Symbol {
+		if n.Equals(&note) {
 			if i == len(notes)-1 {
 				return &notes[0], nil
 			}
@@ -94,7 +94,7 @@ func (n *Note) NextWholeStepNote() (*Note, error) {
 
 func (n *Note) PreviousHalfStepNote() (*Note, error) {
 	for i, note := range notes {
-		if note.Name == n.Name && note.Symbol == n.Symbol {
+		if n.Equals(&note) {
 			if i == 0 {
 				return &notes[len(notes)-1], nil
 			}
@@ -110,4 +110,12 @@ func (n *Note) PreviousWholeStepNote() (*Note, error) {
 		return nil, err
 	}
 	return firstStep.PreviousHalfStepNote()
+}
+
+func (n *Note) Equals(anotherNote *Note) bool {
+	if n.Name == anotherNote.Name && n.Symbol == anotherNote.Symbol {
+		return true
+	}
+
+	return false
 }

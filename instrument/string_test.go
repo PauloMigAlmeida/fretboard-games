@@ -29,5 +29,8 @@ func TestString_FindNote(t *testing.T) {
 	eNote, _ := music.FindNote(music.E, music.Natural)
 	str := NewString(eNote, 24)
 
-	assert.Equal(t, str.FindNote(eNote), []int{0, 12})
+	assert.Equal(t, str.FindNote(eNote), map[int]*music.Note{
+		0:  eNote,
+		12: eNote,
+	})
 }
