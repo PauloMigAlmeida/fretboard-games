@@ -57,15 +57,21 @@ func TestFretboard_GetNoteAt(t *testing.T) {
 }
 
 func TestFretboard_DrawFretboard(t *testing.T) {
-	fretboard := NewFretboard(12, StandardTuning())
+	invalidFretboard := NewFretboard(0, StandardTuning())
+
+	_, err := invalidFretboard.DrawFretboard([]*music.Note{}, []int{})
+	assert.NotNil(t, err)
+
+	validFretboard := NewFretboard(12, StandardTuning())
 
 	noteA, _ := music.FindNote(music.A, music.Natural)
 	noteC, _ := music.FindNote(music.C, music.Natural)
 
 	// Without ignoring strings
-	ret := fretboard.DrawFretboard([]*music.Note{
+	ret, err := validFretboard.DrawFretboard([]*music.Note{
 		noteA,
 	}, []int{})
+	assert.Nil(t, err)
 
 	assert.Equal(t, strings.TrimSpace(`
 | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 |
@@ -77,9 +83,10 @@ func TestFretboard_DrawFretboard(t *testing.T) {
 | -  | -  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  |
 `), ret)
 
-	ret = fretboard.DrawFretboard([]*music.Note{
+	ret, err = validFretboard.DrawFretboard([]*music.Note{
 		noteC,
 	}, []int{})
+	assert.Nil(t, err)
 
 	assert.Equal(t, strings.TrimSpace(`
 | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 |
@@ -92,11 +99,12 @@ func TestFretboard_DrawFretboard(t *testing.T) {
 `), ret)
 
 	// ignoring strings
-	ret = fretboard.DrawFretboard([]*music.Note{
+	ret, err = validFretboard.DrawFretboard([]*music.Note{
 		noteA,
 	}, []int{
 		6, 5, 4, 3, 2,
 	})
+	assert.Nil(t, err)
 
 	assert.Equal(t, strings.TrimSpace(`
 | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 |

@@ -40,8 +40,12 @@ func (f *Fretboard) GetNoteAt(stringNumber int, fretNumber int) (*music.Note, er
 	return &f.Strings[stringNumber-1].FretNotes[fretNumber], nil
 }
 
-func (f *Fretboard) DrawFretboard(notes []*music.Note, ignoreStrings []int) string {
+func (f *Fretboard) DrawFretboard(notes []*music.Note, ignoreStrings []int) (string, error) {
 	var sb strings.Builder
+
+	if len(f.Strings) == 0 || len(f.Strings[0].FretNotes) == 0 {
+		return "", fmt.Errorf("fretboard has no strings or frets")
+	}
 
 	// Header
 	sb.WriteString("|")
@@ -79,5 +83,5 @@ func (f *Fretboard) DrawFretboard(notes []*music.Note, ignoreStrings []int) stri
 		}
 	}
 
-	return sb.String()
+	return sb.String(), nil
 }
