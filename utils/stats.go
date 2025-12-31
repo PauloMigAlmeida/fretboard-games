@@ -30,7 +30,7 @@ func (s *Stats) PrintSummary() {
 	}
 
 	fmt.Println("=======================")
-	fmt.Println("[Game Stats			]")
+	fmt.Println("[Game Stats]")
 	fmt.Printf("Num of questions: %d\n", s.totalQuestions)
 	fmt.Printf("Correct Answers: %d\n", s.correctAnswers)
 	fmt.Printf("Result: %d%%\n", correctPercentage)

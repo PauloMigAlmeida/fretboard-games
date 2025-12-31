@@ -102,7 +102,7 @@ func TestFretboard_DrawFretboard(t *testing.T) {
 	ret, err = validFretboard.DrawFretboard([]*music.Note{
 		noteA,
 	}, []int{
-		6, 5, 4, 3, 2,
+		6, 5, 4, 3,
 	})
 	assert.Nil(t, err)
 

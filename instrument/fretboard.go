@@ -59,7 +59,7 @@ func (f *Fretboard) DrawFretboard(notes []*music.Note, ignoreStrings []int) (str
 		sb.WriteString("|")
 		for _, note := range strEl.FretNotes {
 
-			if slices.Contains(ignoreStrings, strIdx) {
+			if slices.Contains(ignoreStrings, strIdx+1) {
 				sb.WriteString(fmt.Sprintf(" %-3s", "-"))
 			} else {
 				found := false
