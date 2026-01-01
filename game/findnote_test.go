@@ -42,13 +42,13 @@ func TestFindNoteGame_RunStep_WhenCorrectAnswerIsGiven(t *testing.T) {
 	game.NotesAmount = 1
 	game.StringsAmount = 1
 
-	stdin.WriteString("2,14\n")
+	stdin.WriteString("8,20\n")
 	err := game.RunStep()
 	assert.Nil(t, err)
 
 	buf, _ := game.StdOut.(*bytes.Buffer)
 	bufStr := buf.String()
-	assert.Contains(t, bufStr, "Find note(s) [ F# ] across string(s) [ 1 ]")
+	assert.Contains(t, bufStr, "Find note(s) [ D# ] across string(s) [ 3 ]")
 	assert.Contains(t, bufStr, "Correct! ✅")
 }
 
@@ -61,19 +61,19 @@ func TestFindNoteGame_RunStep_WhenWrongAnswerIsGiven(t *testing.T) {
 	game.NotesAmount = 1
 	game.StringsAmount = 1
 
-	stdin.WriteString("2,13\n")
+	stdin.WriteString("8,21\n")
 	err := game.RunStep()
 	assert.Nil(t, err)
 
 	buf, _ := game.StdOut.(*bytes.Buffer)
 	bufStr := buf.String()
-	assert.Contains(t, bufStr, "Find note(s) [ F# ] across string(s) [ 1 ]")
+	assert.Contains(t, bufStr, "Find note(s) [ D# ] across string(s) [ 3 ]")
 	assert.Contains(t, bufStr, "Incorrect! ❌")
 	assert.Contains(t, bufStr, strings.TrimSpace(`
 | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 |
-| -  | -  | X  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
+| -  | -  | -  | -  | -  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | X  | -  | -  | -  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
