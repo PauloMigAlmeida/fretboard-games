@@ -46,7 +46,7 @@ func NewFindNoteGame(fretboard *instrument.Fretboard, stdIn io.Reader, stdOut io
 		StringsAmount: 0,
 		StdIn:         stdIn,
 		StdOut:        stdOut,
-		stats:         utils.NewStats(),
+		stats:         utils.NewStats(stdOut),
 		rng:           rng,
 	}
 }

@@ -1,16 +1,21 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 type Stats struct {
 	totalQuestions int
 	correctAnswers int
+	stdOut         io.Writer
 }
 
-func NewStats() *Stats {
+func NewStats(stdOut io.Writer) *Stats {
 	return &Stats{
 		totalQuestions: 0,
 		correctAnswers: 0,
+		stdOut:         stdOut,
 	}
 }
 
@@ -29,10 +34,18 @@ func (s *Stats) PrintSummary() {
 		correctPercentage = int((float64(s.correctAnswers) / float64(s.totalQuestions)) * 100)
 	}
 
-	fmt.Println("=======================")
-	fmt.Println("[Game Stats]")
-	fmt.Printf("Num of questions: %d\n", s.totalQuestions)
-	fmt.Printf("Correct Answers: %d\n", s.correctAnswers)
-	fmt.Printf("Result: %d%%\n", correctPercentage)
-	fmt.Println("========================")
+	s.Println("=======================")
+	s.Println("[Game Stats]")
+	s.Printf("Num of questions: %d\n", s.totalQuestions)
+	s.Printf("Correct Answers: %d\n", s.correctAnswers)
+	s.Printf("Result: %d%%\n", correctPercentage)
+	s.Println("========================")
+}
+
+func (f *Stats) Println(a ...any) {
+	_, _ = fmt.Fprintln(f.stdOut, a...)
+}
+
+func (f *Stats) Printf(format string, a ...any) {
+	_, _ = fmt.Fprintf(f.stdOut, format, a...)
 }
