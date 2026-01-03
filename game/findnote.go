@@ -80,33 +80,33 @@ func (f *FindNoteGame) Configure() error {
 }
 
 func (f *FindNoteGame) RunStep() error {
-	answer, err := f.buildAnswer()
+	correctAnswer, err := f.buildAnswer()
 	if err != nil {
 		return err
 	}
 
-	f.displayQuestionForAnswer(answer)
+	f.displayQuestionForAnswer(correctAnswer)
 
-	userAnswer, err := f.readAnswerForQuestion(answer)
+	userSubmittedAnswer, err := f.readAnswerForQuestion(correctAnswer)
 	if err != nil {
 		return err
 	}
 
-	f.verifyAnswer(answer, userAnswer)
+	f.verifyAnswer(correctAnswer, userSubmittedAnswer)
 
 	//TODO interpret Contrl-C (probably no at the game level but at a higher abstraction level so it's reusable
 
 	return nil
 }
 
-func (f *FindNoteGame) readAnswerForQuestion(answer map[int]map[int]*music.Note) (map[int]map[int]*music.Note, error) {
-	ret := make(map[int]map[int]*music.Note, 0)
+func (f *FindNoteGame) readAnswerForQuestion(correctAnswer map[int]map[int]*music.Note) (map[int]map[int]*music.Note, error) {
+	userSubmittedAnswer := make(map[int]map[int]*music.Note, 0)
 
-	stringNums := slices.Collect(maps.Keys(answer))
-	sort.Ints(stringNums)
+	stringNumbers := slices.Collect(maps.Keys(correctAnswer))
+	sort.Ints(stringNumbers)
 
-	for _, num := range stringNums {
-		f.Printf("Enter answer for string [%d] (e.g., 3, 15): ", num)
+	for _, stringNumber := range stringNumbers {
+		f.Printf("Enter answer for string [%d] (e.g., 3, 15): ", stringNumber)
 
 		var userInput string
 		_, err := fmt.Fscanf(f.StdIn, "%s\n", &userInput)
@@ -114,15 +114,15 @@ func (f *FindNoteGame) readAnswerForQuestion(answer map[int]map[int]*music.Note)
 			return nil, fmt.Errorf("error reading answer provider by user: %v", err)
 		}
 
-		userAnswer, err := f.parseUserAnswer(userInput, num)
+		parsedAnswer, err := f.parseUserAnswer(userInput, stringNumber)
 		if err != nil {
 			return nil, err
 		}
 
-		maps.Copy(ret, userAnswer)
+		maps.Copy(userSubmittedAnswer, parsedAnswer)
 	}
 
-	return ret, nil
+	return userSubmittedAnswer, nil
 }
 
 func (f *FindNoteGame) buildAnswer() (map[int]map[int]*music.Note, error) {
@@ -135,146 +135,146 @@ func (f *FindNoteGame) buildAnswer() (map[int]map[int]*music.Note, error) {
 		return nil, fmt.Errorf("fretboard has less frets (%d) than requested notes to find (%d)", len(f.Fretboard.Strings[0].FretNotes), f.NotesAmount)
 	}
 
-	randomStrings := make(map[int]bool)
+	selectedStrings := make(map[int]bool)
 
-	for len(randomStrings) < f.StringsAmount {
-		stringNum := f.rng.Intn(len(f.Fretboard.Strings)-1) + 1
+	for len(selectedStrings) < f.StringsAmount {
+		stringNumber := f.rng.Intn(len(f.Fretboard.Strings)-1) + 1
 
-		if _, found := randomStrings[stringNum]; !found {
-			randomStrings[stringNum] = true
+		if _, alreadySelected := selectedStrings[stringNumber]; !alreadySelected {
+			selectedStrings[stringNumber] = true
 		}
 	}
 
-	randomNotes := make(map[*music.Note]bool)
+	targetNotes := make(map[*music.Note]bool)
 
-	for len(randomNotes) < f.NotesAmount {
-		fretNumIdx := f.rng.Intn(len(f.Fretboard.Strings[0].FretNotes))
+	for len(targetNotes) < f.NotesAmount {
+		fretIndex := f.rng.Intn(len(f.Fretboard.Strings[0].FretNotes))
 
 		// the string in itself isn't relevant here as we are trying to get the notes only
-		note, err := f.Fretboard.GetNoteAt(1, fretNumIdx)
+		note, err := f.Fretboard.GetNoteAt(1, fretIndex)
 		if err != nil {
 			return nil, err
 		}
 
-		if _, found := randomNotes[note]; !found {
-			randomNotes[note] = true
+		if _, alreadySelected := targetNotes[note]; !alreadySelected {
+			targetNotes[note] = true
 		}
 	}
 
-	// map[stringNum]: { map[fretNum]: *note }
-	answer := make(map[int]map[int]*music.Note)
+	// map[stringNumber]: { map[fretNumber]: *note }
+	gameAnswer := make(map[int]map[int]*music.Note)
 
-	for stringNum := range randomStrings {
-		combined := make(map[int]*music.Note)
-		for note := range randomNotes {
-			notesInStr := f.Fretboard.Strings[stringNum-1].FindNote(note)
-			maps.Copy(combined, notesInStr)
+	for stringNumber := range selectedStrings {
+		fretPositionsForString := make(map[int]*music.Note)
+		for note := range targetNotes {
+			fretPositions := f.Fretboard.Strings[stringNumber-1].FindNote(note)
+			maps.Copy(fretPositionsForString, fretPositions)
 		}
-		answer[stringNum] = combined
+		gameAnswer[stringNumber] = fretPositionsForString
 	}
 
-	return answer, nil
+	return gameAnswer, nil
 }
 
-func (f *FindNoteGame) displayQuestionForAnswer(answer map[int]map[int]*music.Note) {
-	seenNotes := map[*music.Note]bool{}
+func (f *FindNoteGame) displayQuestionForAnswer(correctAnswer map[int]map[int]*music.Note) {
+	uniqueNotes := map[*music.Note]bool{}
 
 	f.Print("Find note(s) [ ")
-	for _, str := range answer {
-		for _, fret := range str {
-			if !seenNotes[fret] {
-				seenNotes[fret] = true
+	for _, stringFrets := range correctAnswer {
+		for _, noteAtFret := range stringFrets {
+			if !uniqueNotes[noteAtFret] {
+				uniqueNotes[noteAtFret] = true
 			}
 		}
 	}
 
-	notes := slices.Collect(maps.Keys(seenNotes))
-	sort.Slice(notes, func(i, j int) bool {
+	sortedNotes := slices.Collect(maps.Keys(uniqueNotes))
+	sort.Slice(sortedNotes, func(i, j int) bool {
 		return strings.Compare(
-			fmt.Sprintf("%s%s", notes[i].Name, notes[i].Symbol),
-			fmt.Sprintf("%s%s", notes[j].Name, notes[j].Symbol),
+			fmt.Sprintf("%s%s", sortedNotes[i].Name, sortedNotes[i].Symbol),
+			fmt.Sprintf("%s%s", sortedNotes[j].Name, sortedNotes[j].Symbol),
 		) == -1
 	})
 
-	for _, note := range notes {
+	for _, note := range sortedNotes {
 		f.Printf("%s%s ", note.Name, note.Symbol)
 	}
 
 	f.Print("] across string(s) [ ")
 
-	stringNums := slices.Collect(maps.Keys(answer))
-	slices.Sort(stringNums)
+	stringNumbers := slices.Collect(maps.Keys(correctAnswer))
+	slices.Sort(stringNumbers)
 
-	for _, v := range stringNums {
-		f.Printf("%d ", v)
+	for _, stringNumber := range stringNumbers {
+		f.Printf("%d ", stringNumber)
 	}
 	f.Print("]\n")
 }
 
-func (f *FindNoteGame) parseUserAnswer(userAnswer string, stringNum int) (map[int]map[int]*music.Note, error) {
-	answerMap := make(map[int]map[int]*music.Note)
-	fretNumList := make([]int, 0)
+func (f *FindNoteGame) parseUserAnswer(userInputString string, stringNumber int) (map[int]map[int]*music.Note, error) {
+	parsedAnswerMap := make(map[int]map[int]*music.Note)
+	fretNumbersList := make([]int, 0)
 
-	tokens := strings.Split(userAnswer, ",")
-	for _, token := range tokens {
-		fretNum, err := strconv.Atoi(strings.TrimSpace(token))
+	inputTokens := strings.Split(userInputString, ",")
+	for _, token := range inputTokens {
+		fretNumber, err := strconv.Atoi(strings.TrimSpace(token))
 
 		if err != nil {
 			return nil, fmt.Errorf("error parsing user-provider answer '%s': %v", token, err)
 		}
 
-		fretNumList = append(fretNumList, fretNum)
+		fretNumbersList = append(fretNumbersList, fretNumber)
 	}
 
-	for _, fretNum := range fretNumList {
-		note, err := f.Fretboard.GetNoteAt(stringNum, fretNum)
+	for _, fretNumber := range fretNumbersList {
+		note, err := f.Fretboard.GetNoteAt(stringNumber, fretNumber)
 
 		if err != nil {
-			return nil, fmt.Errorf("error note not found at fret number '%d': %v", fretNum, err)
+			return nil, fmt.Errorf("error note not found at fret number '%d': %v", fretNumber, err)
 		}
 
-		if val, ok := answerMap[stringNum]; !ok {
-			answerMap[stringNum] = map[int]*music.Note{
-				fretNum: note,
+		if existingFrets, stringExists := parsedAnswerMap[stringNumber]; !stringExists {
+			parsedAnswerMap[stringNumber] = map[int]*music.Note{
+				fretNumber: note,
 			}
 		} else {
-			val[fretNum] = note
+			existingFrets[fretNumber] = note
 		}
 	}
 
-	return answerMap, nil
+	return parsedAnswerMap, nil
 }
 
 func (f *FindNoteGame) verifyAnswer(correctAnswer map[int]map[int]*music.Note, userAnswer map[int]map[int]*music.Note) {
-	correct := true
+	isAnswerCorrect := true
 
-	for caStrNum, caStrEl := range correctAnswer {
-		uaStrEl, ok := userAnswer[caStrNum]
+	for stringNumber, correctStringFrets := range correctAnswer {
+		userStringFrets, stringExistsInUserAnswer := userAnswer[stringNumber]
 
-		if !ok {
-			correct = false
+		if !stringExistsInUserAnswer {
+			isAnswerCorrect = false
 			break
 		}
 
-		if len(caStrEl) != len(uaStrEl) {
-			correct = false
+		if len(correctStringFrets) != len(userStringFrets) {
+			isAnswerCorrect = false
 			break
 		}
 
-		// compare
-		for fretNum := range caStrEl {
-			caNote, caFound := caStrEl[fretNum]
-			uaNote, uaFound := uaStrEl[fretNum]
+		// compare each fret position
+		for fretNumber := range correctStringFrets {
+			correctNote, correctNoteFound := correctStringFrets[fretNumber]
+			userNote, userNoteFound := userStringFrets[fretNumber]
 
-			if !caFound || !uaFound {
-				correct = false
+			if !correctNoteFound || !userNoteFound {
+				isAnswerCorrect = false
 			} else {
-				correct = correct && caNote.Equals(uaNote)
+				isAnswerCorrect = isAnswerCorrect && correctNote.Equals(userNote)
 			}
 		}
 	}
 
-	if correct {
+	if isAnswerCorrect {
 		f.Println("Correct! ✅")
 	} else {
 		f.Println("Incorrect! ❌ - the correct answer was: [")
@@ -282,36 +282,36 @@ func (f *FindNoteGame) verifyAnswer(correctAnswer map[int]map[int]*music.Note, u
 		f.Println("]")
 	}
 
-	f.stats.RecordAnswer(correct)
+	f.stats.RecordAnswer(isAnswerCorrect)
 }
 
 func (f *FindNoteGame) displayFretboard(correctAnswer map[int]map[int]*music.Note) {
-	ignoredStrings := make([]int, 0)
-	for strIdx := range f.Fretboard.Strings {
-		if _, ok := correctAnswer[strIdx+1]; !ok {
-			ignoredStrings = append(ignoredStrings, strIdx+1)
+	stringsToIgnore := make([]int, 0)
+	for stringIndex := range f.Fretboard.Strings {
+		if _, isStringInAnswer := correctAnswer[stringIndex+1]; !isStringInAnswer {
+			stringsToIgnore = append(stringsToIgnore, stringIndex+1)
 		}
 	}
 
-	notes := make([]*music.Note, 0)
-	for _, fretNotes := range correctAnswer {
-		for _, fretNote := range fretNotes {
+	uniqueNotesToHighlight := make([]*music.Note, 0)
+	for _, fretPositions := range correctAnswer {
+		for _, noteAtPosition := range fretPositions {
 
-			found := false
-			for _, n := range notes {
-				if n.Equals(fretNote) {
-					found = true
+			alreadyAdded := false
+			for _, existingNote := range uniqueNotesToHighlight {
+				if existingNote.Equals(noteAtPosition) {
+					alreadyAdded = true
 				}
 			}
 
-			if !found {
-				notes = append(notes, fretNote)
+			if !alreadyAdded {
+				uniqueNotesToHighlight = append(uniqueNotesToHighlight, noteAtPosition)
 			}
 		}
 	}
 
-	fretboardRepr, _ := f.Fretboard.DrawFretboard(notes, ignoredStrings)
-	f.Println(fretboardRepr)
+	fretboardVisualization, _ := f.Fretboard.DrawFretboard(uniqueNotesToHighlight, stringsToIgnore)
+	f.Println(fretboardVisualization)
 }
 
 func (f *FindNoteGame) Summary() error {
