@@ -87,13 +87,7 @@ func (f *FindNoteGame) RunStep() error {
 
 	f.displayQuestionForAnswer(answer)
 
-	var userInput string
-	_, err = fmt.Fscanf(f.StdIn, "%s\n", &userInput)
-	if err != nil {
-		return fmt.Errorf("error reading answer provider by user: %v", err)
-	}
-
-	userAnswer, err := f.parseUserAnswer(userInput)
+	userAnswer, err := f.readAnswerForQuestion(answer)
 	if err != nil {
 		return err
 	}
@@ -103,6 +97,32 @@ func (f *FindNoteGame) RunStep() error {
 	//TODO interpret Contrl-C (probably no at the game level but at a higher abstraction level so it's reusable
 
 	return nil
+}
+
+func (f *FindNoteGame) readAnswerForQuestion(answer map[int]map[int]*music.Note) (map[int]map[int]*music.Note, error) {
+	ret := make(map[int]map[int]*music.Note, 0)
+
+	stringNums := slices.Collect(maps.Keys(answer))
+	sort.Ints(stringNums)
+
+	for _, num := range stringNums {
+		f.Printf("Enter answer for string [%d] (e.g., 3, 15): ", num)
+
+		var userInput string
+		_, err := fmt.Fscanf(f.StdIn, "%s\n", &userInput)
+		if err != nil {
+			return nil, fmt.Errorf("error reading answer provider by user: %v", err)
+		}
+
+		userAnswer, err := f.parseUserAnswer(userInput, num)
+		if err != nil {
+			return nil, err
+		}
+
+		maps.Copy(ret, userAnswer)
+	}
+
+	return ret, nil
 }
 
 func (f *FindNoteGame) buildAnswer() (map[int]map[int]*music.Note, error) {
@@ -191,7 +211,7 @@ func (f *FindNoteGame) displayQuestionForAnswer(answer map[int]map[int]*music.No
 	f.Print("]\n")
 }
 
-func (f *FindNoteGame) parseUserAnswer(userAnswer string) (map[int]map[int]*music.Note, error) {
+func (f *FindNoteGame) parseUserAnswer(userAnswer string, stringNum int) (map[int]map[int]*music.Note, error) {
 	answerMap := make(map[int]map[int]*music.Note)
 	fretNumList := make([]int, 0)
 
@@ -207,21 +227,18 @@ func (f *FindNoteGame) parseUserAnswer(userAnswer string) (map[int]map[int]*musi
 	}
 
 	for _, fretNum := range fretNumList {
-		for i := range len(f.Fretboard.Strings) {
-			note, err := f.Fretboard.GetNoteAt(i+1, fretNum)
+		note, err := f.Fretboard.GetNoteAt(stringNum, fretNum)
 
-			if err != nil {
-				return nil, fmt.Errorf("error note not found at fret number '%d': %v", fretNum, err)
+		if err != nil {
+			return nil, fmt.Errorf("error note not found at fret number '%d': %v", fretNum, err)
+		}
+
+		if val, ok := answerMap[stringNum]; !ok {
+			answerMap[stringNum] = map[int]*music.Note{
+				fretNum: note,
 			}
-
-			if val, ok := answerMap[i+1]; !ok {
-				answerMap[i+1] = map[int]*music.Note{
-					fretNum: note,
-				}
-			} else {
-				val[fretNum] = note
-			}
-
+		} else {
+			val[fretNum] = note
 		}
 	}
 

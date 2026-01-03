@@ -81,20 +81,16 @@ func TestFindNoteGame_RunStep_WhenWrongAnswerIsGiven(t *testing.T) {
 }
 
 func TestFindNoteGame_RunStep_WithMultipleNotes_WhenCorrectAnswerIsGiven(t *testing.T) {
-	//TODO this test (and the logic behind it, needs to be tweaked)
-	t.Skip("this test (and the logic behind it, needs to be tweaked)")
-
 	fretboard := instrument.NewFretboard(24, instrument.StandardTuning())
-	var stdin bytes.Buffer
-	var stdout bytes.Buffer
+	var stdin, stdout bytes.Buffer
 
 	game := NewFindNoteGame(fretboard, &stdin, &stdout, 1234)
 	game.NotesAmount = 3
 	game.StringsAmount = 3
 
-	stdin.WriteString("9,21,1,13,8,20,")
-	stdin.WriteString("0,12,4,16,11,23,")
-	stdin.WriteString("7,19,11,23,6,18")
+	stdin.WriteString("0,12,4,16,11,23\n")
+	stdin.WriteString("9,21,1,13,8,20\n")
+	stdin.WriteString("7,19,11,23,6,18\n")
 	err := game.RunStep()
 	assert.Nil(t, err)
 
@@ -102,4 +98,33 @@ func TestFindNoteGame_RunStep_WithMultipleNotes_WhenCorrectAnswerIsGiven(t *test
 	bufStr := buf.String()
 	assert.Contains(t, bufStr, "Find note(s) [ D# E G# ] across string(s) [ 1 3 5 ]")
 	assert.Contains(t, bufStr, "Correct! ✅")
+}
+
+func TestFindNoteGame_RunStep_WithMultipleNotes_WhenIncorrectAnswerIsGiven(t *testing.T) {
+	fretboard := instrument.NewFretboard(24, instrument.StandardTuning())
+	var stdin, stdout bytes.Buffer
+
+	game := NewFindNoteGame(fretboard, &stdin, &stdout, 1234)
+	game.NotesAmount = 3
+	game.StringsAmount = 3
+
+	stdin.WriteString("0,12,4,16,11,22\n")
+	stdin.WriteString("9,21,1,13,8,20\n")
+	stdin.WriteString("7,19,11,23,6,18\n")
+	err := game.RunStep()
+	assert.Nil(t, err)
+
+	buf, _ := game.StdOut.(*bytes.Buffer)
+	bufStr := buf.String()
+	assert.Contains(t, bufStr, "Find note(s) [ D# E G# ] across string(s) [ 1 3 5 ]")
+	assert.Contains(t, bufStr, "Incorrect! ❌")
+	assert.Contains(t, bufStr, strings.TrimSpace(`
+| 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 |
+| X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  |
+| -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
+| -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  |
+| -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
+| -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  |
+| -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
+`))
 }
