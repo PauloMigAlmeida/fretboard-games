@@ -1,5 +1,7 @@
 package main
 
+import "github.com/PauloMigAlmeida/fretboard-games/cmd"
+
 func main() {
-	// To be implemented yet
+	cmd.Execute()
 }

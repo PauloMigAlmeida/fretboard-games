@@ -94,8 +94,6 @@ func (f *FindNoteGame) RunStep() error {
 
 	f.verifyAnswer(correctAnswer, userSubmittedAnswer)
 
-	//TODO interpret Contrl-C (probably no at the game level but at a higher abstraction level so it's reusable
-
 	return nil
 }
 
