@@ -15,6 +15,10 @@ It should be able to help me answer questions like:
 | What are the notes in a G major chord ?           |            | 📋 To be implemented |
 | What are the notes of C mixolydian scale ?        |            | 📋 To be implemented |
 
+## Demo
+
+https://github.com/user-attachments/assets/e75632dc-4d9e-4e18-bc82-7c0046c31067
+
 ## Wishlist
 
 - [ ] configurable to allow for different tunings
