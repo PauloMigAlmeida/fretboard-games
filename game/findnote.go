@@ -136,7 +136,7 @@ func (f *FindNoteGame) buildAnswer() (map[int]map[int]*music.Note, error) {
 	selectedStrings := make(map[int]bool)
 
 	for len(selectedStrings) < f.StringsAmount {
-		stringNumber := f.rng.Intn(len(f.Fretboard.Strings)-1) + 1
+		stringNumber := f.rng.Intn(len(f.Fretboard.Strings)) + 1
 
 		if _, alreadySelected := selectedStrings[stringNumber]; !alreadySelected {
 			selectedStrings[stringNumber] = true
