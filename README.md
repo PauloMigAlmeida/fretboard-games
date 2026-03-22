@@ -7,13 +7,13 @@ This is work in progress for 2025-2026.
 The goal is to create a command-line game that helps me memorise the notes and scales on a guitar fretboard.
 It should be able to help me answer questions like:
 
-| Questions                                         | Game Name  |     Implemented      |
-|---------------------------------------------------|:-----------|:--------------------:|
-| List all C notes on the fretboard in strings 1-4. | `findnote` | ✅ Implemented       |
-| What note is on the 5th fret of the 2nd string?   |            | 📋 To be implemented |
-| What are the notes in a C major scale             |            | 📋 To be implemented |
-| What are the notes in a G major chord ?           |            | 📋 To be implemented |
-| What are the notes of C mixolydian scale ?        |            | 📋 To be implemented |
+| Questions                                         | Game Name      |     Implemented      |
+|---------------------------------------------------|:---------------|:--------------------:|
+| List all C notes on the fretboard in strings 1-4. | `findnote`     | ✅ Implemented       |
+| What note is on the 5th fret of the 2nd string?   | `whatnoteisit` | ✅ Implemented       |
+| What are the notes in a C major scale             |                | 📋 To be implemented |
+| What are the notes in a G major chord ?           |                | 📋 To be implemented |
+| What are the notes of C mixolydian scale ?        |                | 📋 To be implemented |
 
 ## Demo
 
