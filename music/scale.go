@@ -12,6 +12,11 @@ const (
 	NaturalMinorScale
 	MelodicMinorScale
 	HarmonicMinorScale
+	MajorPentatonicScale
+	MinorPentatonicScale
+	BluesScale
+	SpanishScale
+	PersianScale
 )
 
 type Scale struct {
@@ -45,6 +50,36 @@ var scales = []Scale{
 		Name:      "Harmonic Minor",
 		Intervals: []int{0, 2, 3, 5, 7, 8, 11},
 		Formula:   "1,2,b3,4,5,b6,7",
+	},
+	{
+		Type:      MajorPentatonicScale,
+		Name:      "Major Pentatonic",
+		Intervals: []int{0, 2, 4, 7, 9},
+		Formula:   "1,2,3,5,6",
+	},
+	{
+		Type:      MinorPentatonicScale,
+		Name:      "Minor Pentatonic",
+		Intervals: []int{0, 3, 5, 7, 10},
+		Formula:   "1,b3,4,5,b7",
+	},
+	{
+		Type:      BluesScale,
+		Name:      "Blues",
+		Intervals: []int{0, 3, 5, 6, 7, 10},
+		Formula:   "1,b3,4,b5,5,b7",
+	},
+	{
+		Type:      SpanishScale,
+		Name:      "Spanish",
+		Intervals: []int{0, 1, 4, 5, 7, 8, 10},
+		Formula:   "1,b2,3,4,5,b6,b7",
+	},
+	{
+		Type:      PersianScale,
+		Name:      "Persian",
+		Intervals: []int{0, 1, 4, 5, 6, 8, 11},
+		Formula:   "1,b2,3,4,b5,b6,7",
 	},
 }
 

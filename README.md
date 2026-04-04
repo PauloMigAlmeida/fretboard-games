@@ -11,9 +11,8 @@ It should be able to help me answer questions like:
 |---------------------------------------------------|:---------------|:--------------------:|
 | List all C notes on the fretboard in strings 1-4. | `findnote`     | ✅ Implemented       |
 | What note is on the 5th fret of the 2nd string?   | `whatnoteisit` | ✅ Implemented       |
-| What are the notes in a C major scale             |                | 📋 To be implemented |
-| What are the notes in a G major chord ?           |                | 📋 To be implemented |
-| What are the notes of C mixolydian scale ?        |                | 📋 To be implemented |
+| What are the notes in a C major scale?            | `whatscaleisit`| ✅ Implemented       |
+| Which scale contains those exact notes?           | `namethescale` | ✅ Implemented       |
 
 ## Demo
 
