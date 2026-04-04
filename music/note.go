@@ -2,6 +2,7 @@ package music
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 type NaturalNote string
@@ -53,6 +54,15 @@ var notes = []Note{
 	{Name: A, Symbol: Natural, EnharmonicNames: []EnharmonicType{}},
 	{Name: A, Symbol: Sharp, EnharmonicNames: []EnharmonicType{{Name: B, Symbol: Flat}}},
 	{Name: B, Symbol: Natural, EnharmonicNames: []EnharmonicType{{Name: C, Symbol: Flat}}},
+}
+
+// RandomNote returns a random note from the chromatic scale.
+// If rng is nil, a new random source is used.
+func RandomNote(rng *rand.Rand) *Note {
+	if rng == nil {
+		rng = rand.New(rand.NewSource(rand.Int63()))
+	}
+	return &notes[rng.Intn(len(notes))]
 }
 
 func FindNote(name NaturalNote, symbol Accidental) (*Note, error) {

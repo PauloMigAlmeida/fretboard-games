@@ -20,21 +20,8 @@ func TestWhatNoteIsItGame_RunStep_WhenCorrectAnswerIsGiven(t *testing.T) {
 
 	game := NewWhatNoteIsItGame(fretboard, &stdin, &stdout, 1234)
 
-	// seed 1234: string=3 (G), fret=11 → F#
-	stdin.WriteString("F#\n")
-	err := game.RunStep()
-	assert.Nil(t, err)
-	assert.Contains(t, stdout.String(), "Correct! ✅")
-}
-
-func TestWhatNoteIsItGame_RunStep_WhenEnharmonicAnswerIsGiven(t *testing.T) {
-	fretboard := instrument.NewFretboard(24, instrument.StandardTuning())
-	var stdin, stdout bytes.Buffer
-
-	game := NewWhatNoteIsItGame(fretboard, &stdin, &stdout, 1234)
-
-	// F# and Gb are enharmonic equivalents
-	stdin.WriteString("Gb\n")
+	// seed 1234: string=3, fret=11 → F#; after shuffling, correct option is 2
+	stdin.WriteString("2\n")
 	err := game.RunStep()
 	assert.Nil(t, err)
 	assert.Contains(t, stdout.String(), "Correct! ✅")
@@ -46,7 +33,8 @@ func TestWhatNoteIsItGame_RunStep_WhenWrongAnswerIsGiven(t *testing.T) {
 
 	game := NewWhatNoteIsItGame(fretboard, &stdin, &stdout, 1234)
 
-	stdin.WriteString("C\n")
+	// seed 1234: option 1 is E, which is wrong
+	stdin.WriteString("1\n")
 	err := game.RunStep()
 	assert.Nil(t, err)
 	assert.Contains(t, stdout.String(), "Incorrect! ❌")
@@ -59,8 +47,7 @@ func TestWhatNoteIsItGame_RunStep_WhenInvalidAnswerIsGiven(t *testing.T) {
 
 	game := NewWhatNoteIsItGame(fretboard, &stdin, &stdout, 1234)
 
-	stdin.WriteString("XYZ\n")
+	stdin.WriteString("9\n")
 	err := game.RunStep()
-	assert.Nil(t, err)
-	assert.Contains(t, stdout.String(), "Incorrect! ❌")
+	assert.NotNil(t, err)
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/PauloMigAlmeida/fretboard-games/utils"
 	"io"
 	"math/rand"
-	"strings"
 )
 
 type WhatNoteIsItGame struct {
@@ -49,17 +48,22 @@ func (w *WhatNoteIsItGame) RunStep() error {
 		return err
 	}
 
-	w.Printf("What note is on fret %d of string %d?: ", fretNumber, stringNumber)
+	options := w.buildOptions(correctNote)
+	correctIdx := w.indexOfCorrect(options, correctNote)
 
-	var userInput string
-	_, err = fmt.Fscanf(w.StdIn, "%s\n", &userInput)
-	if err != nil {
-		return fmt.Errorf("error reading answer provided by user: %v", err)
+	w.Printf("What note is on fret %d of string %d?\n", fretNumber, stringNumber)
+	for i, note := range options {
+		w.Printf("  %d) %s%s\n", i+1, note.Name, note.Symbol)
+	}
+	w.Print("Your answer (1-3): ")
+
+	var choice int
+	_, err = fmt.Fscanf(w.StdIn, "%d\n", &choice)
+	if err != nil || choice < 1 || choice > 3 {
+		return fmt.Errorf("invalid input: expected a number between 1 and 3")
 	}
 
-	userInput = strings.TrimSpace(userInput)
-
-	correct := w.checkAnswer(userInput, correctNote)
+	correct := choice-1 == correctIdx
 
 	if correct {
 		w.Println("Correct! ✅")
@@ -71,28 +75,37 @@ func (w *WhatNoteIsItGame) RunStep() error {
 	return nil
 }
 
-func (w *WhatNoteIsItGame) checkAnswer(userInput string, correctNote *music.Note) bool {
-	// parse user input into a Note so enharmonic equivalents are accepted
-	var name music.NaturalNote
-	var symbol music.Accidental
-
-	switch len(userInput) {
-	case 1:
-		name = music.NaturalNote(strings.ToUpper(userInput))
-		symbol = music.Natural
-	case 2:
-		name = music.NaturalNote(strings.ToUpper(string(userInput[0])))
-		symbol = music.Accidental(string(userInput[1]))
-	default:
-		return false
+// buildOptions returns a shuffled slice of 3 notes: 1 correct + 2 distinct wrong ones.
+func (w *WhatNoteIsItGame) buildOptions(correctNote *music.Note) []*music.Note {
+	wrongMap := make(map[string]*music.Note, 2)
+	for len(wrongMap) < 2 {
+		candidate := music.RandomNote(w.rng)
+		if candidate.Equals(correctNote) {
+			continue
+		}
+		key := string(candidate.Name) + string(candidate.Symbol)
+		if _, exists := wrongMap[key]; !exists {
+			wrongMap[key] = candidate
+		}
 	}
 
-	userNote, err := music.FindNote(name, symbol)
-	if err != nil {
-		return false
+	wrong := make([]*music.Note, 0, 2)
+	for _, n := range wrongMap {
+		wrong = append(wrong, n)
 	}
 
-	return correctNote.Equals(userNote)
+	options := []*music.Note{correctNote, wrong[0], wrong[1]}
+	w.rng.Shuffle(len(options), func(i, j int) { options[i], options[j] = options[j], options[i] })
+	return options
+}
+
+func (w *WhatNoteIsItGame) indexOfCorrect(options []*music.Note, correctNote *music.Note) int {
+	for i, n := range options {
+		if n.Equals(correctNote) {
+			return i
+		}
+	}
+	return -1
 }
 
 func (w *WhatNoteIsItGame) Summary() error {
