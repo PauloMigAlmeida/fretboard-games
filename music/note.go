@@ -56,6 +56,11 @@ var notes = []Note{
 	{Name: B, Symbol: Natural, EnharmonicNames: []EnharmonicType{{Name: C, Symbol: Flat}}},
 }
 
+// AllNotes returns all notes in the chromatic scale.
+func AllNotes() []Note {
+	return notes
+}
+
 // RandomNote returns a random note from the chromatic scale.
 // If rng is nil, a new random source is used.
 func RandomNote(rng *rand.Rand) *Note {
@@ -128,4 +133,17 @@ func (n *Note) Equals(anotherNote *Note) bool {
 	}
 
 	return false
+}
+
+// PreferFlat returns the note name using flat notation when the note is a sharp accidental
+// (e.g., C# → Db, D# → Eb). Natural notes are returned as-is.
+func (n *Note) PreferFlat() string {
+	if n.Symbol == Sharp {
+		for _, e := range n.EnharmonicNames {
+			if e.Symbol == Flat {
+				return string(e.Name) + string(e.Symbol)
+			}
+		}
+	}
+	return string(n.Name) + string(n.Symbol)
 }

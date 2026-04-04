@@ -88,15 +88,15 @@ func TestFindNoteGame_RunStep_WithMultipleNotes_WhenCorrectAnswerIsGiven(t *test
 	game.NotesAmount = 3
 	game.StringsAmount = 3
 
-	stdin.WriteString("0,12,4,16,11,23\n")
-	stdin.WriteString("9,21,1,13,8,20\n")
-	stdin.WriteString("7,19,11,23,6,18\n")
+	stdin.WriteString("4,16,6,18,11,23\n")
+	stdin.WriteString("1,13,3,15,8,20\n")
+	stdin.WriteString("4,16,6,18,11,23\n")
 	err := game.RunStep()
 	assert.Nil(t, err)
 
 	buf, _ := game.StdOut.(*bytes.Buffer)
 	bufStr := buf.String()
-	assert.Contains(t, bufStr, "Find note(s) [ D# E G# ] across string(s) [ 1 3 5 ]")
+	assert.Contains(t, bufStr, "Find note(s) [ A# D# G# ] across string(s) [ 1 3 6 ]")
 	assert.Contains(t, bufStr, "Correct! ✅")
 }
 
@@ -108,23 +108,23 @@ func TestFindNoteGame_RunStep_WithMultipleNotes_WhenIncorrectAnswerIsGiven(t *te
 	game.NotesAmount = 3
 	game.StringsAmount = 3
 
-	stdin.WriteString("0,12,4,16,11,22\n")
-	stdin.WriteString("9,21,1,13,8,20\n")
-	stdin.WriteString("7,19,11,23,6,18\n")
+	stdin.WriteString("4,16,6,18,11,22\n")
+	stdin.WriteString("1,13,3,15,8,20\n")
+	stdin.WriteString("4,16,6,18,11,23\n")
 	err := game.RunStep()
 	assert.Nil(t, err)
 
 	buf, _ := game.StdOut.(*bytes.Buffer)
 	bufStr := buf.String()
-	assert.Contains(t, bufStr, "Find note(s) [ D# E G# ] across string(s) [ 1 3 5 ]")
+	assert.Contains(t, bufStr, "Find note(s) [ A# D# G# ] across string(s) [ 1 3 6 ]")
 	assert.Contains(t, bufStr, "Incorrect! ❌")
 	assert.Contains(t, bufStr, strings.TrimSpace(`
 | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 |
-| X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  |
+| -  | -  | -  | -  | X  | -  | X  | -  | -  | -  | -  | X  | -  | -  | -  | -  | X  | -  | X  | -  | -  | -  | -  | X  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
-| -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  |
+| -  | X  | -  | X  | -  | -  | -  | -  | X  | -  | -  | -  | -  | X  | -  | X  | -  | -  | -  | -  | X  | -  | -  | -  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
-| -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  | -  | -  | -  | -  | -  | -  | X  | X  | -  | -  | -  | X  |
 | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  | -  |
+| -  | -  | -  | -  | X  | -  | X  | -  | -  | -  | -  | X  | -  | -  | -  | -  | X  | -  | X  | -  | -  | -  | -  | X  |
 `))
 }
